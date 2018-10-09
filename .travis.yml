@@ -14,7 +14,6 @@ after_success:
   - docker build -t regnagleppod/multi-server -f ./server
   - docker build -t regnagleppod/multi-worker -f ./worker
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  # Take these images and push them to docker hub
   - docker push regnagleppod/multi-client
   - docker push regnagleppod/multi-nginx
   - docker push regnagleppod/multi-server
