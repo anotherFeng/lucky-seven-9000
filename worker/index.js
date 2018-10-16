@@ -8,12 +8,29 @@ const redisClient = redis.createClient({
 });
 const sub = redisClient.duplicate();
 
-function fib(index) {
-  if (index < 2) return 1;
-  return fib(index - 1) + fib(index - 2);
-}
+// function luckySeven(startingBet) {
+//   const currentAmount = startingBet;
+//   const totalRolls = 0;
+//   const scores = [0];
+//   while(startingBet > 0) {
+//     let die1 = Math.floor((Math.random()*6)+1);
+//     let die2 = Math.floor((Math.random()*6)+1);
+//     if (die1 + die2 === 7){
+//       currentAmount += 4;
+//     }
+//     else {
+//       currentAmount -= 1;
+//     }
+//     scores.push(currentAmount);
+//     currentAmount -- ;
+//     totalRolls ++ ;
+//   };
+//   const highestScore = Math.max.apply(Math, scores);
+//   const rollCountAtHighestAmountWon = scores.indexOf(highestScore);
+//   return [totalRolls, highestScore, rollCountAtHighestAmountWon];
+// }
 
 sub.on('message', (channel, message) => {
-  redisClient.hset('values', message, fib(parseInt(message)));
+  redisClient.hset('values', message, luckySeven(parseInt(message)));
 });
 sub.subscribe('insert');

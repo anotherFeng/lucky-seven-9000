@@ -3,51 +3,47 @@ import axios from 'axios';
 
 class LuckySeven extends Component {
   state = {
-    seenIndexes: [],
-    scores: {},
-    startingBet: ''
+    scores: [],
+    startingBet: '',
+    totalRolls: '',
+    highestScore: '',
+    rollCounts: '',
   };
 
   componentDidMount() {
     this.fetchHistoricHighestScores();
-    this.fetchIndexes();
   }
 
   async fetchHistoricHighestScores() {
-    const scores = await axios.get('/api/score/historic');
+    const scores = await axios.get('/api/scores/historic');
+    
     this.setState({ scores: scores.data });
   }
 
-  async fetchIndexes() {
-    const seenIndexes = await axios.get('/api/values/all');
-    this.setState({
-      seenIndexes: seenIndexes.data
-    });
-  }
-
   handlePlay = () => {
-    console.log(this.state.startingBet)
+    const startingBet = this.startingBet;
     axios.post('/api/play', {
       startingBet: this.state.startingBet
-    });
-    this.setState({ index: '' });
+    }).then(({data : {results}}) => {
+      this.setState({
+        startingBet,
+        totalRolls: results[0],
+        rollCounts: results[1],
+        highestScore: results[2]
+      });
+    })
+    this.setState({ startingBet: '' });
   };
-
-  renderSeenIndexes() {
-    return this.state.seenIndexes.map(({ number }) => number).join(', ');
-  }
 
   renderHistoricHighestScores() {
     const entries = [];
-
-    for (let key in this.state.values) {
+    for (let i = 0; i < this.state.scores.length; i++ ) {
       entries.push(
-        <div key={key}>
-          For index {key} I calculated {this.state.values[key]}
-        </div>
+        <tr key={i}>
+          {this.state.scores[i]}
+        </tr>
       );
     }
-
     return entries;
   }
 
@@ -75,20 +71,27 @@ class LuckySeven extends Component {
             <tbody>
               <tr>
                 <td>Starting Bet</td>
-                <td><span id="initBet"></span></td>
+                <td>{this.state.startingBet}</td>
               </tr>
               <tr>
                 <td>Total Rolls Before Going Broke</td>
-                <td><span id="result1"></span></td>
+                <td>{this.state.totalRolls}</td>
               </tr>
               <tr>
                 <td>Highest Amount Won</td>
-                <td><span id="result2"></span></td>
+                <td>{this.state.highestScore}</td>
               </tr>
               <tr>
                 <td>Roll Count at Highest Amount Won</td>
-                <td><span id="result3"></span></td>
+                <td>{this.state.rollCounts}</td>
               </tr>
+            </tbody>
+          </table>
+
+          <table align="center">
+            <caption>Historic Results</caption>
+            <tbody>
+              {this.renderHistoricHighestScores()}
             </tbody>
           </table>
         </div>

@@ -21,7 +21,7 @@ const pgClient = new Pool({
 pgClient.on('error', () => console.log('Lost PG connection'));
 
 pgClient
-  .query('CREATE TABLE IF NOT EXISTS scores (number INT)')
+  .query('CREATE TABLE IF NOT EXISTS scores ("total-rolls" INT, "roll-counts" INT, "highest-score" INT)')
   .catch(err => console.log(err));
 
 // Redis Client Setup
@@ -33,26 +33,55 @@ const redisClient = redis.createClient({
 });
 const redisPublisher = redisClient.duplicate();
 
+const luckySeven = (startingBet) => {
+  let currentAmount = startingBet;
+  let totalRolls = 0;
+  const scores = [0];
+  while(currentAmount > 0) {
+    let die1 = Math.floor((Math.random()*6)+1);
+    let die2 = Math.floor((Math.random()*6)+1);
+    if (die1 + die2 === 7){
+      currentAmount += 4;
+    }
+    else {
+      currentAmount -= 1;
+    }
+    scores.push(currentAmount);
+    currentAmount -- ;
+    totalRolls ++ ;
+  };
+  const highestScore = Math.max.apply(Math, scores);
+  const rollCountAtHighestAmountWon = scores.indexOf(highestScore);
+  return [totalRolls, rollCountAtHighestAmountWon, highestScore];
+}
+
 // Express route handlers
 
 app.get('/', (req, res) => {
-  res.send('Hi');
+  res.send('yo');
 });
 
-app.get('/score/historic', async (req, res) => {
-  const scores = await pgClient.query('SELECT * from scores');
-  res.send(scores.rows);
+app.get('/scores/historic', async (req, res) => {
+  const scores = await pgClient.query('SELECT "highest-score" from scores ORDER BY "highest-score" DESC LIMIT 10');
+  const results = [];
+  for(let i = 0; i < scores.rows.length; i++) {
+    results.push(scores.rows[i]['highest-score'])
+  }
+  console.log(results)
+  res.send(results);
 });
 
-app.get('/values/current', async (req, res) => {
+app.post('/play', (req, res) => {
+  const startingBet = req.body.startingBet;
+  let results = luckySeven(parseInt(startingBet));
+  pgClient.query('INSERT INTO scores("total-rolls", "roll-counts", "highest-score") VALUES($1, $2, $3)', results)
+  res.status(200).send({ working: true, results });
+});
+
+app.get('/scores/current', async (req, res) => {
   redisClient.hgetall('values', (err, values) => {
     res.send(values);
   });
-});
-
-app.post('/play', async (req, res) => {
-  const startingBet = req.body.startingBet;
-  console.log(req.body.startingBet);
 });
 
 // app.post('/values', async (req, res) => {
