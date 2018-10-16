@@ -19,15 +19,15 @@ after_success:
   - docker push regnagleppod/lucky-seven-server
   - docker push regnagleppod/lucky-seven-worker
 
-# deploy:
-#   provider: elasticbeanstalk
-#   region: us-east-2
-#   app: multi-docker
-#   env: MultiDocker-env
-#   bucket_name: elasticbeanstalk-us-east-2-652613104016
-#   bucket_path: docker-multi
-#   on:
-#     branch: master
-#   access_key_id: $AWS_ACCESS_KEY
-#   secret_access_key:
-#     secure: $AWS_SECRET_KEY
+deploy:
+  provider: elasticbeanstalk
+  region: us-east-2
+  app: lucky-seven
+  env: LuckySeven-env
+  bucket_name: elasticbeanstalk-us-east-2-652613104016
+  bucket_path: docker-multi
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key:
+    secure: $AWS_SECRET_KEY
