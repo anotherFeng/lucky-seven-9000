@@ -16,7 +16,6 @@ class LuckySeven extends Component {
 
   async fetchHistoricHighestScores() {
     const scores = await axios.get('/api/scores/historic');
-    
     this.setState({ scores: scores.data });
   }
 

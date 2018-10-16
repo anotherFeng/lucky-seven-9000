@@ -9,25 +9,25 @@ script:
   - docker run regnagleppod/react-test npm test -- --coverage
 
 after_success:
-  - docker build -t regnagleppod/multi-client ./client
-  - docker build -t regnagleppod/multi-nginx ./nginx
-  - docker build -t regnagleppod/multi-server ./server
-  - docker build -t regnagleppod/multi-worker ./worker
+  - docker build -t regnagleppod/lucky-seven-client ./client
+  - docker build -t regnagleppod/lucky-seven-nginx ./nginx
+  - docker build -t regnagleppod/lucky-seven-server ./server
+  - docker build -t regnagleppod/lucky-seven-worker ./worker
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  - docker push regnagleppod/multi-client
-  - docker push regnagleppod/multi-nginx
-  - docker push regnagleppod/multi-server
-  - docker push regnagleppod/multi-worker
+  - docker push regnagleppod/lucky-seven-client
+  - docker push regnagleppod/lucky-seven-nginx
+  - docker push regnagleppod/lucky-seven-server
+  - docker push regnagleppod/lucky-seven-worker
 
-deploy:
-  provider: elasticbeanstalk
-  region: us-east-2
-  app: multi-docker
-  env: MultiDocker-env
-  bucket_name: elasticbeanstalk-us-east-2-652613104016
-  bucket_path: docker-multi
-  on:
-    branch: master
-  access_key_id: $AWS_ACCESS_KEY
-  secret_access_key:
-    secure: $AWS_SECRET_KEY
+# deploy:
+#   provider: elasticbeanstalk
+#   region: us-east-2
+#   app: multi-docker
+#   env: MultiDocker-env
+#   bucket_name: elasticbeanstalk-us-east-2-652613104016
+#   bucket_path: docker-multi
+#   on:
+#     branch: master
+#   access_key_id: $AWS_ACCESS_KEY
+#   secret_access_key:
+#     secure: $AWS_SECRET_KEY
