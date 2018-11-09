@@ -9,7 +9,6 @@ dockerized it and push them to AWS Elastic Beanstalk, with RDS taking care of th
 
 # Now Over 9000!
 * React 
-* Semantic UI 
 * Node / Express 
 * Redis 
 * Postgres
